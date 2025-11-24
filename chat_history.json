@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "is_user": true,
+    "q": "Halo",
+    "timestamp": "2025-11-24T14:51:46.453442"
+  },
+  {
+    "is_user": false,
+    "a": "Halo! Ada yang bisa saya bantu hari ini?",
+    "timestamp": "2025-11-24T14:51:46.453442"
+  }
+]
