@@ -1,0 +1,20 @@
+{
+  "cvs": [
+    {
+      "id": "6beb5cb1-4e26-46ff-9c69-aa9d381a8444",
+      "name": "MUHAMMAD ADAM",
+      "email": "adam.muhammad362@gmail.com",
+      "phone": "+62 ",
+      "experience": "PLN - Icon Plus, IT Technikal Support, Jul 2023 - Sekarang, Membuat aplikasi berdasarkan kebutuhan Proses Bisnis Operasional. Memberikan dukungan Teknis Permasalahan User melalui Ticketing ITSM.",
+      "skills": "Python, JavaScript, React, Django, PHP, Laravel, MySQL, Arduino IDE, Arduino MicroController, Raspy MicroController",
+      "education": "Teknik Informatika(D4) Double Degree, Politeknik Negeri Jember, Indonesia, Aug 2023, IPK: 3.57/4.00",
+      "summary": "Muhammad Adam adalah lulusan Teknik Informatika dengan pengalaman sebagai Fullstack Developer dan IoT Engineer. Memiliki keahlian dalam pengembangan aplikasi fungsional, efisien, dan aman dengan penerapan prinsip secure coding.",
+      "uploaded_at": "2025-12-10T13:48:49.088484",
+      "source": "pdf_upload",
+      "screening_status": "screened",
+      "session_id": "ca117812-663c-4bf5-902f-b0e14628b5d6",
+      "batch": "Batch 1",
+      "position": "Backend Dev"
+    }
+  ]
+}

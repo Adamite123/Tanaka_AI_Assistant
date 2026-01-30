@@ -1210,6 +1210,7 @@
         // State
         let challenges = [];
         let selectedChallenge = null;
+        let leaderboardInterval = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -1222,8 +1223,26 @@
             });
         });
 
+        // Start/Stop Leaderboard Polling
+        function startLeaderboardPolling() {
+            // Clear existing interval
+            stopLeaderboardPolling();
+            // Poll every 5 seconds
+            leaderboardInterval = setInterval(loadLeaderboard, 5000);
+        }
+
+        function stopLeaderboardPolling() {
+            if (leaderboardInterval) {
+                clearInterval(leaderboardInterval);
+                leaderboardInterval = null;
+            }
+        }
+
         // Show Section
         function showSection(section) {
+            // Stop polling when switching tabs
+            stopLeaderboardPolling();
+
             // Update nav tabs
             document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
@@ -1232,9 +1251,10 @@
             document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
             document.getElementById(section + '-section').classList.add('active');
 
-            // Refresh leaderboard when shown
+            // Refresh leaderboard and start polling when shown
             if (section === 'leaderboard') {
                 loadLeaderboard();
+                startLeaderboardPolling();
             }
         }
 

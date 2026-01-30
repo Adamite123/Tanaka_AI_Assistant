@@ -1,0 +1,31 @@
+{
+  "templates": [
+    {
+      "id": "eec28f60-7a09-4c90-bc78-72b628d4d2fc",
+      "name": "Senior Full Stack Developer",
+      "description": "Migrated from existing criteria: Senior Full Stack Developer",
+      "criteria_points": [
+        "Menguasai Python/JavaScript dan framework modern",
+        "Pengalaman dengan database relasional dan NoSQL",
+        "Pendidikan politeknik"
+      ],
+      "created_at": "2025-12-03T00:00:00",
+      "updated_at": "2025-12-04T10:35:07.666189",
+      "is_active": true,
+      "usage_count": 1
+    },
+    {
+      "id": "716f344f-fb64-4b5e-99c7-3dbb467d97f7",
+      "name": "Junior Akuntan",
+      "description": "Freshgraduate",
+      "criteria_points": [
+        "Power BI",
+        "Microsoft excel"
+      ],
+      "created_at": "2025-12-04T13:45:17.505868",
+      "updated_at": "2025-12-10T10:26:42.869798",
+      "is_active": true,
+      "usage_count": 1
+    }
+  ]
+}

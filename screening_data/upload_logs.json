@@ -1,0 +1,17 @@
+{
+  "logs": [
+    {
+      "id": "c3b2b317-2b2d-4733-9a39-02c2b5748721",
+      "filename": "CV_adam_10_2025.pdf",
+      "status": "success",
+      "cv_name": "MUHAMMAD ADAM",
+      "error": null,
+      "session_id": "ca117812-663c-4bf5-902f-b0e14628b5d6",
+      "batch": "Batch 1",
+      "position": "Backend Dev",
+      "uploaded_at": "2025-12-10T13:48:49.104801",
+      "uploaded_date": "2025-12-10",
+      "uploaded_time": "13:48:49"
+    }
+  ]
+}
