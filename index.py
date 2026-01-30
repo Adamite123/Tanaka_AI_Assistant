@@ -230,7 +230,7 @@ def get_ai_response(user_prompt):
         if not api_key:
             return {"error": "API key not configured"}
 
-        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7, api_key=api_key)
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7, api_key=api_key, max_tokens=500)
 
         response = llm.invoke(user_prompt)
         result_text = response.content if hasattr(response, 'content') else str(response)
