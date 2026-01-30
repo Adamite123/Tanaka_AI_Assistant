@@ -35,24 +35,24 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1rem;
         }
 
         /* Header */
         .header {
             text-align: center;
-            padding: 2rem 0;
+            padding: 1.5rem 0;
             color: white;
         }
 
         .header h1 {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
         .header p {
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             opacity: 0.9;
         }
 
@@ -60,17 +60,18 @@
         .nav-tabs {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
         }
 
         .nav-tab {
-            padding: 1rem 2rem;
+            padding: 0.7rem 1.2rem;
             background: rgba(255,255,255,0.2);
             border: none;
             border-radius: 50px;
             color: white;
-            font-size: 1rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -78,7 +79,6 @@
 
         .nav-tab:hover {
             background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
         }
 
         .nav-tab.active {
@@ -89,9 +89,47 @@
         /* Main Card */
         .main-card {
             background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .container {
+                padding: 2rem;
+            }
+
+            .header {
+                padding: 2rem 0;
+            }
+
+            .header h1 {
+                font-size: 3rem;
+            }
+
+            .header p {
+                font-size: 1.2rem;
+            }
+
+            .nav-tabs {
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .nav-tab {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+
+            .nav-tab:hover {
+                transform: translateY(-2px);
+            }
+
+            .main-card {
+                border-radius: 20px;
+                padding: 2rem;
+            }
         }
 
         /* Page Sections */
@@ -106,23 +144,21 @@
         /* Challenge Selection */
         .challenge-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: 1fr;
+            gap: 1rem;
         }
 
         .challenge-card {
             background: var(--light);
-            border-radius: 15px;
-            padding: 1.5rem;
+            border-radius: 12px;
+            padding: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            border: 3px solid transparent;
+            border: 2px solid transparent;
         }
 
         .challenge-card:hover {
-            transform: translateY(-5px);
             border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
         }
 
         .challenge-card.selected {
@@ -134,12 +170,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
         .challenge-number {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             background: var(--primary);
             color: white;
             border-radius: 50%;
@@ -147,12 +183,13 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            font-size: 0.9rem;
         }
 
         .difficulty-badge {
-            padding: 0.3rem 0.8rem;
+            padding: 0.25rem 0.6rem;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -162,16 +199,55 @@
         .difficulty-hard { background: #fee2e2; color: #991b1b; }
 
         .challenge-title {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--dark);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
         .challenge-task {
             color: var(--text);
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        @media (min-width: 768px) {
+            .challenge-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .challenge-card {
+                border-radius: 15px;
+                padding: 1.5rem;
+                border-width: 3px;
+            }
+
+            .challenge-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            }
+
+            .challenge-number {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .difficulty-badge {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.75rem;
+            }
+
+            .challenge-title {
+                font-size: 1.2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .challenge-task {
+                font-size: 0.95rem;
+                line-height: 1.5;
+            }
         }
 
         /* Game Section */
@@ -183,51 +259,53 @@
         .current-challenge {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 2rem;
-            border-radius: 15px;
-            margin-bottom: 2rem;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
         }
 
         .current-challenge h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
         }
 
         .challenge-info {
             background: rgba(255,255,255,0.15);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 0.75rem;
         }
 
         .challenge-info p {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
         }
 
         .challenge-info strong {
-            display: inline-block;
-            width: 120px;
+            display: block;
+            margin-bottom: 0.2rem;
         }
 
         /* Prompt Input */
         .prompt-section {
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .prompt-section h4 {
             color: var(--dark);
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
         }
 
         .prompt-textarea {
             width: 100%;
-            min-height: 150px;
-            padding: 1rem;
+            min-height: 120px;
+            padding: 0.75rem;
             border: 2px solid var(--border);
-            border-radius: 10px;
+            border-radius: 8px;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.9rem;
             resize: vertical;
             transition: border-color 0.3s ease;
         }
@@ -239,24 +317,24 @@
 
         .char-count {
             text-align: right;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #6b7280;
-            margin-top: 0.5rem;
+            margin-top: 0.3rem;
         }
 
         /* Player Name Input */
         .player-input {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         .player-input input {
             flex: 1;
-            padding: 0.8rem 1rem;
+            padding: 0.7rem 0.75rem;
             border: 2px solid var(--border);
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
         }
 
         .player-input input:focus {
@@ -266,16 +344,17 @@
 
         /* Buttons */
         .btn {
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.25rem;
             border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center;
+            gap: 0.4rem;
         }
 
         .btn-primary {
@@ -283,15 +362,9 @@
             color: white;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
-        }
-
         .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
         }
 
         .btn-secondary {
@@ -305,7 +378,80 @@
 
         .btn-block {
             width: 100%;
-            justify-content: center;
+        }
+
+        @media (min-width: 768px) {
+            .current-challenge {
+                padding: 2rem;
+                border-radius: 15px;
+                margin-bottom: 2rem;
+            }
+
+            .current-challenge h3 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .challenge-info {
+                padding: 1rem;
+                border-radius: 10px;
+                margin-top: 1rem;
+            }
+
+            .challenge-info p {
+                margin-bottom: 0.5rem;
+                font-size: 1rem;
+            }
+
+            .challenge-info strong {
+                display: inline-block;
+                width: 160px;
+                margin-bottom: 0;
+            }
+
+            .prompt-section {
+                margin-bottom: 2rem;
+            }
+
+            .prompt-section h4 {
+                margin-bottom: 1rem;
+                font-size: 1.2rem;
+            }
+
+            .prompt-textarea {
+                min-height: 150px;
+                padding: 1rem;
+                border-radius: 10px;
+                font-size: 1rem;
+            }
+
+            .char-count {
+                font-size: 0.85rem;
+                margin-top: 0.5rem;
+            }
+
+            .player-input {
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .player-input input {
+                padding: 0.8rem 1rem;
+                border-radius: 10px;
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 1rem 2rem;
+                border-radius: 10px;
+                font-size: 1rem;
+                gap: 0.5rem;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+            }
         }
 
         /* Results Section */
@@ -352,39 +498,33 @@
         /* Score Cards */
         .score-cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .score-cards {
-                grid-template-columns: 1fr;
-            }
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
 
         .score-card {
             background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
+            border-radius: 10px;
+            padding: 1rem;
             text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
 
-        .score-card.clarity { border-top: 4px solid #3b82f6; }
-        .score-card.instruction { border-top: 4px solid #10b981; }
-        .score-card.hallucination { border-top: 4px solid #f59e0b; }
+        .score-card.clarity { border-top: 3px solid #3b82f6; }
+        .score-card.instruction { border-top: 3px solid #10b981; }
+        .score-card.hallucination { border-top: 3px solid #f59e0b; }
 
         .score-label {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: #6b7280;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
 
         .score-value {
-            font-size: 3rem;
+            font-size: 2rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
 
         .score-card.clarity .score-value { color: #3b82f6; }
@@ -392,69 +532,140 @@
         .score-card.hallucination .score-value { color: #f59e0b; }
 
         .score-feedback {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: var(--text);
-            line-height: 1.4;
+            line-height: 1.3;
         }
 
         /* Total Score */
         .total-score {
             background: linear-gradient(135deg, var(--dark) 0%, #312e81 100%);
             color: white;
-            border-radius: 15px;
-            padding: 2rem;
+            border-radius: 12px;
+            padding: 1.25rem;
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .total-score h3 {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
             opacity: 0.9;
         }
 
         .total-score .big-score {
-            font-size: 5rem;
+            font-size: 3rem;
             font-weight: 700;
         }
 
         .total-score .score-label {
             color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
         }
 
         .overall-feedback {
             background: var(--light);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
 
         .overall-feedback h4 {
             color: var(--dark);
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
         }
 
         .overall-feedback p {
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 0.85rem;
+        }
+
+        @media (min-width: 768px) {
+            .score-cards {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .score-card {
+                border-radius: 15px;
+                padding: 1.5rem;
+                border-top-width: 4px;
+            }
+
+            .score-label {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .score-value {
+                font-size: 3rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .score-feedback {
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+
+            .total-score {
+                border-radius: 15px;
+                padding: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .total-score h3 {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+
+            .total-score .big-score {
+                font-size: 5rem;
+            }
+
+            .overall-feedback {
+                border-radius: 15px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .overall-feedback h4 {
+                margin-bottom: 1rem;
+                font-size: 1rem;
+            }
+
+            .overall-feedback p {
+                line-height: 1.6;
+                font-size: 1rem;
+            }
         }
 
         /* Leaderboard */
+        .leaderboard-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 500px;
         }
 
         .leaderboard-table th,
         .leaderboard-table td {
-            padding: 1rem;
+            padding: 0.6rem 0.5rem;
             text-align: left;
             border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
         }
 
         .leaderboard-table th {
             background: var(--light);
             font-weight: 600;
             color: var(--dark);
+            white-space: nowrap;
         }
 
         .leaderboard-table tr:hover {
@@ -462,14 +673,14 @@
         }
 
         .rank-badge {
-            width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
         }
 
         .rank-1 { background: #ffd700; color: #7c5800; }
@@ -480,9 +691,94 @@
         .score-badge {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 0.3rem 0.8rem;
+            padding: 0.2rem 0.5rem;
             border-radius: 20px;
             font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        /* Mobile Leaderboard Cards */
+        .leaderboard-cards {
+            display: none;
+        }
+
+        .leaderboard-card {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .leaderboard-card.rank-1-card { border-left-color: #ffd700; }
+        .leaderboard-card.rank-2-card { border-left-color: #c0c0c0; }
+        .leaderboard-card.rank-3-card { border-left-color: #cd7f32; }
+
+        .leaderboard-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .leaderboard-card-name {
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .leaderboard-card-challenge {
+            font-size: 0.8rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .leaderboard-card-scores {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .leaderboard-card-score {
+            background: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.7rem;
+        }
+
+        .leaderboard-card-score span {
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .leaderboard-table-container {
+                display: none;
+            }
+
+            .leaderboard-cards {
+                display: block;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .rank-badge {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+
+            .score-badge {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.9rem;
+            }
         }
 
         /* Loading */
@@ -556,11 +852,127 @@
             font-weight: bold;
         }
 
+        /* AI Response */
+        .ai-response {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-response h4 {
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .ai-response-content {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+
+        @media (min-width: 768px) {
+            .ai-response {
+                border-radius: 15px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .ai-response h4 {
+                margin-bottom: 1rem;
+                font-size: 1rem;
+            }
+
+            .ai-response-content {
+                padding: 1rem;
+                border-radius: 10px;
+                max-height: 300px;
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+        }
+
+        /* Action buttons mobile */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .action-buttons {
+                flex-direction: row;
+                justify-content: center;
+                gap: 1rem;
+            }
+        }
+
         /* Footer */
         .footer {
             text-align: center;
-            padding: 2rem;
+            padding: 1.5rem;
             color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+        }
+
+        @media (min-width: 768px) {
+            .footer {
+                padding: 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Section title mobile */
+        .section-title {
+            margin-bottom: 1rem;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
+        @media (min-width: 768px) {
+            .section-title {
+                margin-bottom: 1.5rem;
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Tips section mobile */
+        .tips-section {
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 10px;
+        }
+
+        .tips-section h4 {
+            font-size: 0.95rem;
+        }
+
+        .tips-list li {
+            font-size: 0.85rem;
+            padding: 0.4rem 0;
+        }
+
+        @media (min-width: 768px) {
+            .tips-section {
+                padding: 1.5rem;
+                margin-top: 2rem;
+                border-radius: 15px;
+            }
+
+            .tips-section h4 {
+                font-size: 1rem;
+            }
+
+            .tips-list li {
+                font-size: 1rem;
+                padding: 0.5rem 0;
+            }
         }
     </style>
 </head>
@@ -585,7 +997,7 @@
             <section id="play-section" class="page-section active">
                 <!-- Step 1: Choose Challenge -->
                 <div id="step-choose" class="step-section">
-                    <h2 style="margin-bottom: 1.5rem; color: var(--dark);">Pilih Challenge</h2>
+                    <h2 class="section-title">Pilih Challenge</h2>
                     <div class="challenge-grid" id="challenge-grid">
                         <!-- Challenges loaded here -->
                     </div>
@@ -674,7 +1086,7 @@
                             </div>
 
                             <!-- Action Buttons -->
-                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <div class="action-buttons">
                                 <button class="btn btn-secondary" onclick="tryAgain()">
                                     Coba Lagi
                                 </button>
@@ -685,9 +1097,9 @@
                         </div>
 
                         <!-- Back Button -->
-                        <div style="text-align: center; margin-top: 1.5rem;">
+                        <div style="text-align: center; margin-top: 1rem;">
                             <button class="btn btn-secondary" onclick="backToChoose()">
-                                Kembali ke Pilih Challenge
+                                Kembali
                             </button>
                         </div>
                     </div>
@@ -696,30 +1108,39 @@
 
             <!-- Leaderboard Section -->
             <section id="leaderboard-section" class="page-section">
-                <h2 style="margin-bottom: 1.5rem; color: var(--dark);">Leaderboard</h2>
-                <div id="leaderboard-content">
-                    <table class="leaderboard-table">
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Nama</th>
-                                <th>Challenge</th>
-                                <th>Clarity</th>
-                                <th>Instruction</th>
-                                <th>Hallucination</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboard-body">
-                            <!-- Leaderboard data loaded here -->
-                        </tbody>
-                    </table>
+                <h2 class="section-title">Leaderboard</h2>
+
+                <!-- Mobile Cards View -->
+                <div class="leaderboard-cards" id="leaderboard-cards">
+                    <!-- Cards loaded here -->
+                </div>
+
+                <!-- Desktop Table View -->
+                <div class="leaderboard-table-container">
+                    <div class="leaderboard-container">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nama</th>
+                                    <th>Challenge</th>
+                                    <th>C</th>
+                                    <th>I</th>
+                                    <th>H</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body">
+                                <!-- Leaderboard data loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- Guide Section -->
             <section id="guide-section" class="page-section">
-                <h2 style="margin-bottom: 1.5rem; color: var(--dark);">Panduan Bermain</h2>
+                <h2 class="section-title">Panduan Bermain</h2>
 
                 <div class="tips-section" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); margin-bottom: 1.5rem;">
                     <h4 style="color: #1e40af;">Cara Bermain</h4>
@@ -963,18 +1384,20 @@
         // Render Leaderboard
         function renderLeaderboard(players) {
             const tbody = document.getElementById('leaderboard-body');
+            const cardsContainer = document.getElementById('leaderboard-cards');
 
             if (players.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" style="text-align: center; padding: 3rem; color: #6b7280;">
-                            Belum ada data. Jadilah yang pertama!
-                        </td>
-                    </tr>
+                const emptyMsg = `
+                    <div style="text-align: center; padding: 2rem; color: #6b7280;">
+                        Belum ada data. Jadilah yang pertama!
+                    </div>
                 `;
+                tbody.innerHTML = `<tr><td colspan="7">${emptyMsg}</td></tr>`;
+                cardsContainer.innerHTML = emptyMsg;
                 return;
             }
 
+            // Render table for desktop
             tbody.innerHTML = players.map((player, index) => {
                 const rank = index + 1;
                 let rankClass = 'rank-default';
@@ -992,6 +1415,38 @@
                         <td>${player.scores.hallucination}</td>
                         <td><span class="score-badge">${Math.round(player.total_score)}</span></td>
                     </tr>
+                `;
+            }).join('');
+
+            // Render cards for mobile
+            cardsContainer.innerHTML = players.map((player, index) => {
+                const rank = index + 1;
+                let cardClass = '';
+                if (rank === 1) cardClass = 'rank-1-card';
+                else if (rank === 2) cardClass = 'rank-2-card';
+                else if (rank === 3) cardClass = 'rank-3-card';
+
+                let rankBadgeClass = 'rank-default';
+                if (rank === 1) rankBadgeClass = 'rank-1';
+                else if (rank === 2) rankBadgeClass = 'rank-2';
+                else if (rank === 3) rankBadgeClass = 'rank-3';
+
+                return `
+                    <div class="leaderboard-card ${cardClass}">
+                        <div class="leaderboard-card-header">
+                            <div class="leaderboard-card-name">
+                                <span class="rank-badge ${rankBadgeClass}">${rank}</span>
+                                ${player.player_name}
+                            </div>
+                            <span class="score-badge">${Math.round(player.total_score)}</span>
+                        </div>
+                        <div class="leaderboard-card-challenge">${player.challenge_title}</div>
+                        <div class="leaderboard-card-scores">
+                            <div class="leaderboard-card-score">C: <span>${player.scores.clarity}</span></div>
+                            <div class="leaderboard-card-score">I: <span>${player.scores.instruction_following}</span></div>
+                            <div class="leaderboard-card-score">H: <span>${player.scores.hallucination}</span></div>
+                        </div>
+                    </div>
                 `;
             }).join('');
         }
