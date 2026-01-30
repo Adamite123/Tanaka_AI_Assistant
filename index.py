@@ -1,353 +1,353 @@
+"""
+PromptPing - Game Evaluasi Prompt
+Game untuk menilai kemampuan siswa membuat prompt berdasarkan:
+1. Clarity (Kejelasan Prompt)
+2. Instruction Following (Kepatuhan Instruksi)
+3. Hallucination (Halusinasi)
+"""
+
 from flask import Flask, request, render_template, jsonify
 import os
 import json
 from datetime import datetime
 from dotenv import load_dotenv
+import uuid
 
 # Import LangChain components
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_chroma import Chroma
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.messages import HumanMessage, AIMessage
-from langchain.chains import create_history_aware_retriever, create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_openai import ChatOpenAI
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
-# app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-here-change-in-production')
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'promptping-secret-key-2025')
 
-# ================= PERSISTENT STORAGE =================
+# ================= CONFIGURATION =================
 
-CHAT_HISTORY_FILE = "chat_history.json"
+DATA_DIR = "game_data"
+SCORES_FILE = os.path.join(DATA_DIR, "scores.json")
+LEADERBOARD_FILE = os.path.join(DATA_DIR, "leaderboard.json")
 
-def load_chat_history():
-    """Load chat history dari file JSON"""
-    if os.path.exists(CHAT_HISTORY_FILE):
-        try:
-            with open(CHAT_HISTORY_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"Error loading chat history: {e}")
-            return []
-    return []
+# Ensure data directories exist
+if not os.path.exists(DATA_DIR):
+    os.makedirs(DATA_DIR)
 
-def save_chat_history(messages):
-    """Save chat history ke file JSON"""
+# ================= GAME CHALLENGES =================
+
+CHALLENGES = [
+    {
+        "id": 1,
+        "title": "Penjelasan Konsep",
+        "task": "Minta AI menjelaskan apa itu 'Machine Learning' untuk anak SMP",
+        "context": "Kamu adalah guru yang perlu menjelaskan konsep teknologi ke siswa SMP",
+        "expected_output": "Penjelasan sederhana tentang Machine Learning dengan analogi yang mudah dipahami anak SMP",
+        "difficulty": "easy"
+    },
+    {
+        "id": 2,
+        "title": "Menulis Email Formal",
+        "task": "Minta AI menulis email permohonan izin tidak masuk kerja karena sakit",
+        "context": "Kamu adalah karyawan yang perlu mengirim email ke atasan",
+        "expected_output": "Email formal dengan format yang benar, alasan yang jelas, dan nada sopan",
+        "difficulty": "easy"
+    },
+    {
+        "id": 3,
+        "title": "Analisis Data",
+        "task": "Minta AI menganalisis data penjualan berikut dan berikan insight: Jan: 100, Feb: 150, Mar: 120, Apr: 200, May: 180",
+        "context": "Kamu adalah manajer yang perlu memahami tren penjualan",
+        "expected_output": "Analisis trend, insight tentang kenaikan/penurunan, dan rekomendasi",
+        "difficulty": "medium"
+    },
+    {
+        "id": 4,
+        "title": "Debugging Code",
+        "task": "Minta AI untuk menemukan bug dalam kode berikut: for i in range(10): print(i) if i = 5: break",
+        "context": "Kamu adalah programmer yang butuh bantuan debugging",
+        "expected_output": "Identifikasi bug (= seharusnya ==) dan penjelasan mengapa itu error",
+        "difficulty": "medium"
+    },
+    {
+        "id": 5,
+        "title": "Kreasi Konten",
+        "task": "Minta AI membuat caption Instagram untuk promosi produk kopi lokal dengan target anak muda",
+        "context": "Kamu adalah social media manager untuk brand kopi",
+        "expected_output": "Caption yang catchy, menggunakan bahasa anak muda, ada call-to-action",
+        "difficulty": "medium"
+    },
+    {
+        "id": 6,
+        "title": "Pembuatan Rencana",
+        "task": "Minta AI membuat rencana belajar untuk persiapan ujian TOEFL dalam 30 hari",
+        "context": "Kamu adalah mahasiswa yang akan ujian TOEFL bulan depan",
+        "expected_output": "Rencana terstruktur dengan jadwal harian/mingguan, target skor, dan strategi per section",
+        "difficulty": "hard"
+    },
+    {
+        "id": 7,
+        "title": "Argumentasi",
+        "task": "Minta AI membuat argumen pro dan kontra tentang 'Work From Home permanen'",
+        "context": "Kamu sedang mempersiapkan debat di kantor",
+        "expected_output": "Minimal 3 argumen pro dan 3 argumen kontra yang berimbang dan didukung fakta",
+        "difficulty": "hard"
+    }
+]
+
+# ================= DATA MANAGEMENT =================
+
+def load_json_file(filepath):
+    """Load JSON file safely"""
     try:
-        with open(CHAT_HISTORY_FILE, 'w', encoding='utf-8') as f:
-            json.dump(messages, f, ensure_ascii=False, indent=2)
+        if os.path.exists(filepath):
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return json.load(f)
     except Exception as e:
-        print(f"Error saving chat history: {e}")
+        print(f"Error loading {filepath}: {e}")
+    return None
 
-def add_to_vectorstore(user_message, ai_response):
+def save_json_file(filepath, data):
+    """Save data to JSON file safely"""
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving {filepath}: {e}")
+        return False
+
+def load_leaderboard():
+    """Load leaderboard"""
+    data = load_json_file(LEADERBOARD_FILE)
+    return data if data else {"players": []}
+
+def save_leaderboard(data):
+    """Save leaderboard"""
+    return save_json_file(LEADERBOARD_FILE, data)
+
+# ================= PROMPT EVALUATION =================
+
+def evaluate_prompt(user_prompt, challenge, ai_response):
     """
-    Menambahkan percakapan baru ke ChromaDB sebagai knowledge tambahan
-    Format: "User bertanya: [question]. Jawabannya: [answer]"
+    Evaluate user's prompt based on 3 criteria:
+    1. Clarity (Kejelasan) - 0-100
+    2. Instruction Following (Kepatuhan Instruksi) - 0-100
+    3. Hallucination (Halusinasi) - 0-100 (higher = less hallucination = better)
     """
     try:
         api_key = os.getenv('OPENAI_API_KEY')
-        embeddings = OpenAIEmbeddings(api_key=api_key)
-        persist_dir = "./chroma_db"
-        
-        # Load existing vectorstore
-        vectorstore = Chroma(
-            persist_directory=persist_dir,
-            embedding_function=embeddings
-        )
-        
-        # Format percakapan sebagai knowledge
-        conversation_text = f"User bertanya: {user_message}. Jawabannya: {ai_response}"
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Tambahkan metadata untuk tracking
-        vectorstore.add_texts(
-            texts=[conversation_text],
-            metadatas=[{
-                "source": "chat_history",
-                "timestamp": timestamp,
-                "type": "conversation"
-            }]
-        )
-        
-        print(f">>> Conversation added to vectorstore at {timestamp}")
-        
+        if not api_key:
+            return {
+                "error": "API key not configured",
+                "scores": {"clarity": 50, "instruction_following": 50, "hallucination": 50}
+            }
+
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=api_key)
+
+        evaluation_prompt = f"""
+Kamu adalah evaluator ahli untuk menilai kualitas prompt yang dibuat oleh siswa.
+
+TUGAS YANG DIBERIKAN:
+{challenge['task']}
+
+KONTEKS:
+{challenge['context']}
+
+OUTPUT YANG DIHARAPKAN:
+{challenge['expected_output']}
+
+PROMPT YANG DIBUAT SISWA:
+{user_prompt}
+
+RESPONS AI DARI PROMPT TERSEBUT:
+{ai_response}
+
+Evaluasi prompt siswa berdasarkan 3 kriteria berikut:
+
+1. CLARITY (Kejelasan Prompt) - 0-100
+   - Apakah prompt jelas dan tidak ambigu?
+   - Apakah instruksi mudah dipahami?
+   - Apakah ada detail yang cukup?
+
+2. INSTRUCTION FOLLOWING (Kepatuhan Instruksi) - 0-100
+   - Apakah prompt sesuai dengan tugas yang diberikan?
+   - Apakah prompt mencakup semua persyaratan?
+   - Apakah output AI sesuai dengan yang diharapkan?
+
+3. HALLUCINATION (Anti-Halusinasi) - 0-100
+   - Apakah prompt mendorong jawaban faktual?
+   - Apakah ada batasan yang jelas untuk mencegah AI mengarang?
+   - Apakah output AI tidak mengandung informasi palsu/mengarang?
+   (Skor tinggi = tidak ada halusinasi, Skor rendah = banyak halusinasi)
+
+Berikan output dalam format JSON:
+{{
+    "clarity": {{
+        "score": <0-100>,
+        "feedback": "<penjelasan singkat>"
+    }},
+    "instruction_following": {{
+        "score": <0-100>,
+        "feedback": "<penjelasan singkat>"
+    }},
+    "hallucination": {{
+        "score": <0-100>,
+        "feedback": "<penjelasan singkat>"
+    }},
+    "overall_feedback": "<feedback keseluruhan dan tips untuk perbaikan>",
+    "total_score": <rata-rata dari 3 kriteria>
+}}
+"""
+
+        response = llm.invoke(evaluation_prompt)
+        result_text = response.content if hasattr(response, 'content') else str(response)
+
+        # Parse JSON from response
+        import re
+        json_match = re.search(r'\{[\s\S]*\}', result_text)
+        if json_match:
+            try:
+                evaluation = json.loads(json_match.group())
+                return {"success": True, "evaluation": evaluation}
+            except json.JSONDecodeError:
+                pass
+
+        # Fallback
+        return {
+            "success": False,
+            "error": "Could not parse evaluation",
+            "raw_response": result_text
+        }
+
     except Exception as e:
-        print(f"Error adding to vectorstore: {e}")
+        print(f"Error evaluating prompt: {e}")
+        return {"success": False, "error": str(e)}
 
-# ================= RAG SETUP =================
-
-def setup_rag_chain():
-    """
-    Menginisialisasi Vector Store (ChromaDB) dan Conversational RAG Chain.
-    """
-    file_path = 'datasheet.json'
-
-    api_key = os.getenv('OPENAI_API_KEY')
-    if not api_key:
-        print("WARNING: OPENAI_API_KEY not found in environment")
-        return None
-
-    # Import Knowladge base dari file datasheet.json
-    with open(file_path, 'r') as f:
-        knowledge_base = json.load(f)
-
+def get_ai_response(user_prompt):
+    """Get AI response for user's prompt"""
     try:
-        embeddings = OpenAIEmbeddings(api_key=api_key)
-        persist_dir = "./chroma_db"
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            return {"error": "API key not configured"}
 
-        # 2. Cek apakah DB sudah ada
-        if os.path.exists(persist_dir):
-            print(">>> Loading existing ChromaDB Vector Store...")
-            vectorstore = Chroma(
-                persist_directory=persist_dir,
-                embedding_function=embeddings
-            )
-        else:
-            print(">>> Creating new ChromaDB Vector Store...")
-            vectorstore = Chroma.from_texts(
-                texts=knowledge_base,
-                embedding=embeddings,
-                persist_directory=persist_dir
-            )
-        
-        # Retriever dengan K=6 untuk mendapat lebih banyak konteks
-        retriever = vectorstore.as_retriever(search_kwargs={"k": 6})
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7, api_key=api_key)
 
-        # 3. Model (LLM)
-        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7, api_key=api_key)
+        response = llm.invoke(user_prompt)
+        result_text = response.content if hasattr(response, 'content') else str(response)
 
-        # PROMPT + RETRIEVER HISTORY/MEMORY PERCAKAPAN SEBELUMNYA SET UP >>>>>>>>>>>>>>>>>>>>>>> START
-        # 4. History-Aware Retriever
-        contextualize_q_system_prompt = """
-        Anda adalah pengolah pertanyaan cerdas. Tugas Anda adalah menganalisis riwayat percakapan (chat_history) dan pertanyaan user saat ini (input) untuk menghasilkan **satu pertanyaan mandiri yang lengkap**.
-
-        Tujuan:
-        1.  Jika pertanyaan user saat ini memiliki dependensi konteks dari riwayat percakapan (misalnya, menggunakan kata ganti seperti "itu", "dia", "tersebut"), maka gabungkan konteks yang relevan untuk membuat pertanyaan baru yang **eksplisit dan lengkap** (tidak ambigu).
-        2.  Jika pertanyaan user saat ini sudah jelas, berdiri sendiri, dan tidak membutuhkan konteks dari riwayat percakapan, maka kembalikan pertanyaan user tersebut **apa adanya**.
-
-        Aturan Keras:
-        * Output Anda HANYA berupa pertanyaan tunggal yang telah dikontekstualisasikan.
-        * Jangan pernah menambahkan komentar, penjelasan, atau informasi tambahan di luar pertanyaan yang dihasilkan.
-        """
-        
-        contextualize_q_prompt = ChatPromptTemplate.from_messages([
-            ("system", contextualize_q_system_prompt),
-            MessagesPlaceholder("chat_history"),
-            ("human", "{input}"),
-        ])
-        
-        history_aware_retriever = create_history_aware_retriever(
-            llm, retriever, contextualize_q_prompt
-        )
-
-        # PROMPT + RETRIEVER HISTORY SET UP >>>>>>>>>>>>>>>>>>>>>>> END
-
-        # PROMPT + RETRIEVER PRESENT atau sekarang SET UP >>>>>>>>>>>>>>>>>>>>>>> START
-        # 5. Answer Chain
-        qa_system_prompt = """
-        Anda adalah **Mouna**, seorang Asisten AI Layanan Pelanggan (Customer Service) yang profesional dan ramah dari Mountain Camp Booking. Tugas utama Anda adalah menjawab pertanyaan user secara akurat, natural, dan membantu, **hanya berdasarkan** informasi yang tersedia dalam `Konteks dari knowledge base` yang disediakan.
-
-        ### ATURAN UTAMA (WAJIB DIIKUTI):
-
-        1.  **WAJIB Gunakan Context Knowledge Base:**
-            - **PRIORITAS UTAMA**: Cari jawaban dari `{context}` yang disediakan di bawah
-            - Baca SEMUA informasi dalam context dengan teliti sebelum menjawab
-            - Jika ada informasi relevan di context (walaupun partial), GUNAKAN informasi tersebut
-            - **DILARANG KERAS** mengatakan "tidak ada informasi" jika context berisi data relevan
-
-        2.  **Jawaban Natural dan Informatif:**
-            - **JANGAN** pernah gunakan kata "Maaf" di awal jawaban
-            - **JANGAN** suruh user "hubungi customer service" jika informasi ADA di context
-            - Gunakan intro singkat yang natural (1 kalimat) sebelum memberikan detail/list
-            - Akhiri dengan kalimat penutup yang mengajak interaksi lebih lanjut jika relevan
-            - Contoh BAIK: "Kami melayani pendakian ke 15+ gunung di Indonesia:" [list gunung]
-            - Contoh BURUK: "Maaf, saya tidak memiliki informasi..." atau "Silahkan hubungi CS"
-
-        3.  **Format Keterbacaan:**
-            - Jika jawaban berisi 3+ item atau data kompleks, gunakan format bullet points atau numbered list
-            - Berikan intro singkat sebelum list untuk konteks
-            - Tambahkan detail relevan dalam list (misal: harga, lokasi, spesifikasi)
-
-        4.  **Struktur Jawaban Ideal:**
-            ```
-            [Intro singkat 1 kalimat yang menjawab pertanyaan]
-
-            [Detail dalam format list jika > 3 item:]
-            - Item 1 (detail tambahan jika ada)
-            - Item 2 (detail tambahan jika ada)
-            - Item 3 (detail tambahan jika ada)
-
-            [Penutup mengajak interaksi - opsional]
-            ```
-
-        5.  **Handling Pertanyaan Spesifik:**
-            - **"Berapa harga camping?"** → Ekstrak SEMUA info harga dari context, berikan breakdown per kategori kesulitan (mudah/sedang/sulit) dengan nama gunung dan range harga
-            - **"Fasilitas apa saja?"** → Ekstrak SEMUA fasilitas dari context, list dengan detail (merk, spesifikasi, kapasitas)
-            - **"Cara booking?"** → Berikan step-by-step dalam numbered list dari info di context
-            - **"Gunung apa saja?"** → List semua gunung yang disebutkan di context dengan lokasi
-
-        6.  **Jika Data Benar-Benar Tidak Ada di Context:**
-            - Hanya jika **BENAR-BENAR** tidak ada informasi relevan sama sekali di context
-            - Berikan jawaban umum yang membantu (jangan bilang "tidak tahu")
-            - Tawarkan informasi alternatif yang tersedia
-
-        7.  **Nada Bahasa:** Ramah, natural, profesional tapi tidak kaku. Seperti CS manusia yang helpful.
-
-        ### PROFIL DAN TUGAS:
-
-        * **Identitas:** Mouna dari Mountain Camp Booking
-        * **Konsistensi:** Jaga konsistensi jawaban dengan riwayat percakapan
-        * **Tujuan:** Membantu user mendapatkan informasi yang jelas dan lengkap DARI KNOWLEDGE BASE
-
-        Konteks dari knowledge base:
-        {context}
-        """
-        
-        qa_prompt = ChatPromptTemplate.from_messages([
-            ("system", qa_system_prompt),
-            MessagesPlaceholder("chat_history"),
-            ("human", "{input}"),
-        ])
-        
-        question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
-
-        # PROMPT + RETRIEVER PRESENT atau sekarang SET UP >>>>>>>>>>>>>>>>>>>>>>> END
-
-        # 6. Final Retrieval Chain // #Ini Final Chain atau sebelum data kita dikirim ke LLM/OPEN AI
-        # history_aware_retriever = Retriever dan Prompt untuk memberi pemahaman dan kemampuan RAG berdasarkan history
-        # question_answer_chain = Retriever dan Prompt untuk menjawab pertanyaan present bukan pertanyaan sebelum sebelumnya
-        # rag_chain = Gabungan antara kemampuan menjawab pertanyaan saat ini + pemahaman percakapan sebelumnya
-        rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
-        
-        print(">>> ChromaDB & Conversational RAG Initialized Successfully")
-        return rag_chain
+        return {"success": True, "response": result_text}
 
     except Exception as e:
-        print(f"Error initializing RAG: {e}")
-        return None
+        print(f"Error getting AI response: {e}")
+        return {"success": False, "error": str(e)}
 
-# Initialize Chain Global
-rag_chain = setup_rag_chain()
-
-# ================= ROUTES (AJAX API) =================
+# ================= ROUTES =================
 
 @app.route('/')
 def index():
-    """Render halaman utama"""
+    """Render main game page"""
     return render_template('index.html')
 
-@app.route('/get_history', methods=['GET'])
-def get_history():
-    """API endpoint untuk mengambil chat history"""
-    try:
-        messages = load_chat_history()
-        return jsonify({"success": True, "messages": messages})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+@app.route('/api/challenges', methods=['GET'])
+def get_challenges():
+    """Get all available challenges"""
+    return jsonify({"success": True, "data": CHALLENGES})
 
-@app.route('/send_message', methods=['POST'])
-def send_message():
-    """API endpoint untuk mengirim pesan dan mendapat response"""
+@app.route('/api/challenge/<int:challenge_id>', methods=['GET'])
+def get_challenge(challenge_id):
+    """Get specific challenge"""
+    challenge = next((c for c in CHALLENGES if c['id'] == challenge_id), None)
+    if challenge:
+        return jsonify({"success": True, "data": challenge})
+    return jsonify({"success": False, "error": "Challenge not found"}), 404
+
+@app.route('/api/submit', methods=['POST'])
+def submit_prompt():
+    """Submit prompt for evaluation"""
     try:
         data = request.get_json()
-        user_message = data.get('message', '').strip()
-        
-        if not user_message:
-            return jsonify({"error": "Message cannot be empty"}), 400
-        
-        if not os.getenv('OPENAI_API_KEY'):
-            return jsonify({"error": "OpenAI API key is not set!"}), 500
-        
-        # Load chat history
-        messages = load_chat_history()
-        
-        if rag_chain:
-            # --- PROSES HISTORY ---
-            # Ambil maksimal 20 pesan terakhir (10 percakapan)
-            recent_messages = messages[-20:] 
-            
-            chat_history = []
-            for msg in recent_messages:
-                if msg.get("is_user"):
-                    chat_history.append(HumanMessage(content=msg["q"]))
-                else:
-                    chat_history.append(AIMessage(content=msg["a"]))
+        user_prompt = data.get('prompt', '')
+        challenge_id = data.get('challenge_id')
+        player_name = data.get('player_name', 'Anonymous')
 
-            # --- INVOKE RAG ---
-            response = rag_chain.invoke({
-                "input": user_message,
-                "chat_history": chat_history
-            })
-            
-            answer = response["answer"]
-            
-            # Simpan percakapan baru ke vectorstore
-            add_to_vectorstore(user_message, answer)
-        else:
-            answer = "Maaf, sistem AI sedang tidak dapat diinisialisasi."
+        if not user_prompt:
+            return jsonify({"success": False, "error": "Prompt tidak boleh kosong"}), 400
 
-        # Simpan ke file dengan timestamp
-        timestamp = datetime.now().isoformat()
-        new_messages = [
-            {
-                "is_user": True, 
-                "q": user_message,
-                "timestamp": timestamp
+        # Get challenge
+        challenge = next((c for c in CHALLENGES if c['id'] == challenge_id), None)
+        if not challenge:
+            return jsonify({"success": False, "error": "Challenge tidak ditemukan"}), 404
+
+        # Get AI response for the prompt
+        ai_result = get_ai_response(user_prompt)
+        if not ai_result.get('success'):
+            return jsonify({"success": False, "error": ai_result.get('error', 'Failed to get AI response')}), 500
+
+        ai_response = ai_result['response']
+
+        # Evaluate the prompt
+        eval_result = evaluate_prompt(user_prompt, challenge, ai_response)
+        if not eval_result.get('success'):
+            return jsonify({"success": False, "error": eval_result.get('error', 'Failed to evaluate')}), 500
+
+        evaluation = eval_result['evaluation']
+
+        # Save to leaderboard
+        leaderboard = load_leaderboard()
+        entry = {
+            "id": str(uuid.uuid4()),
+            "player_name": player_name,
+            "challenge_id": challenge_id,
+            "challenge_title": challenge['title'],
+            "prompt": user_prompt,
+            "ai_response": ai_response,
+            "scores": {
+                "clarity": evaluation['clarity']['score'],
+                "instruction_following": evaluation['instruction_following']['score'],
+                "hallucination": evaluation['hallucination']['score']
             },
-            {
-                "is_user": False, 
-                "a": answer,
-                "timestamp": timestamp
-            }
-        ]
-        
-        messages.extend(new_messages)
-        save_chat_history(messages)
-        
+            "total_score": evaluation['total_score'],
+            "timestamp": datetime.now().isoformat()
+        }
+        leaderboard['players'].append(entry)
+        save_leaderboard(leaderboard)
+
         return jsonify({
             "success": True,
-            "response": answer,
-            "timestamp": timestamp
+            "data": {
+                "ai_response": ai_response,
+                "evaluation": evaluation,
+                "entry": entry
+            }
         })
 
     except Exception as e:
-        app.logger.error(f"Error in send_message: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        print(f"Error submitting prompt: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
-@app.route('/reset', methods=['POST'])
-def reset():
-    """Reset chat history (hanya UI, tidak menghapus dari vectorstore)"""
+@app.route('/api/leaderboard', methods=['GET'])
+def get_leaderboard():
+    """Get leaderboard sorted by total score"""
     try:
-        save_chat_history([])
-        return jsonify({"success": True, "message": "Chat history reset successfully"})
+        leaderboard = load_leaderboard()
+        players = leaderboard.get('players', [])
+
+        # Sort by total_score descending
+        players.sort(key=lambda x: x.get('total_score', 0), reverse=True)
+
+        # Get top 20
+        top_players = players[:20]
+
+        return jsonify({"success": True, "data": top_players})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-@app.route('/clear_all', methods=['POST'])
-def clear_all():
-    """
-    Menghapus semua data (chat history + vectorstore)
-    HATI-HATI: Ini akan menghapus semua data termasuk knowledge base!
-    """
+@app.route('/api/leaderboard/clear', methods=['POST'])
+def clear_leaderboard():
+    """Clear leaderboard (admin only)"""
     try:
-        import shutil
-        
-        # Hapus chat history
-        if os.path.exists(CHAT_HISTORY_FILE):
-            os.remove(CHAT_HISTORY_FILE)
-        
-        # Hapus vectorstore
-        persist_dir = "./chroma_db"
-        if os.path.exists(persist_dir):
-            shutil.rmtree(persist_dir)
-        
-        # Reinitialize RAG dengan knowledge base baru
-        global rag_chain
-        rag_chain = setup_rag_chain()
-        
-        return jsonify({"success": True, "message": "All data cleared successfully"})
+        save_leaderboard({"players": []})
+        return jsonify({"success": True, "message": "Leaderboard cleared"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

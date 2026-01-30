@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tanaka AI Assistant</title>
+    <title>PromptPing - Game Evaluasi Prompt</title>
     <style>
         * {
             margin: 0;
@@ -11,505 +11,990 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e1b4b;
+            --text: #374151;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --border: #e5e7eb;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            color: var(--text);
         }
 
         .container {
-            width: 100%;
-            max-width: 800px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 90vh;
-            max-height: 700px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            text-align: center;
+            padding: 2rem 0;
             color: white;
-            padding: 20px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .header h1 {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
-        .header-buttons {
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
             display: flex;
-            gap: 10px;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
-        .btn-reset, .btn-clear {
+        .nav-tab {
+            padding: 1rem 2rem;
             background: rgba(255,255,255,0.2);
-            color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
-        .btn-reset:hover {
+        .nav-tab:hover {
             background: rgba(255,255,255,0.3);
             transform: translateY(-2px);
         }
 
-        .btn-clear:hover {
-            background: rgba(255,0,0,0.3);
-            transform: translateY(-2px);
-        }
-
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-
-        .message {
-            margin-bottom: 20px;
-            display: flex;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message-content {
-            max-width: 70%;
-            padding: 12px 18px;
-            border-radius: 18px;
-            word-wrap: break-word;
-            line-height: 1.5;
-        }
-
-        .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.ai .message-content {
+        .nav-tab.active {
             background: white;
-            color: #333;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: var(--primary);
         }
 
-        .message-time {
-            font-size: 11px;
-            color: #999;
-            margin-top: 5px;
+        /* Main Card */
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        /* Page Sections */
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
             display: block;
         }
 
-        .input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
+        /* Challenge Selection */
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
         }
 
-        .input-form {
-            display: flex;
-            gap: 10px;
-        }
-
-        #messageInput {
-            flex: 1;
-            padding: 12px 18px;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        #messageInput:focus {
-            border-color: #667eea;
-        }
-
-        .btn-send {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
+        .challenge-card {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 1.5rem;
             cursor: pointer;
-            font-size: 15px;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .challenge-card.selected {
+            border-color: var(--success);
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .difficulty-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 600;
-            transition: all 0.3s;
+            text-transform: uppercase;
         }
 
-        .btn-send:hover:not(:disabled) {
+        .difficulty-easy { background: #d1fae5; color: #065f46; }
+        .difficulty-medium { background: #fef3c7; color: #92400e; }
+        .difficulty-hard { background: #fee2e2; color: #991b1b; }
+
+        .challenge-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .challenge-task {
+            color: var(--text);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Game Section */
+        .game-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .current-challenge {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .current-challenge h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-info {
+            background: rgba(255,255,255,0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .challenge-info p {
+            margin-bottom: 0.5rem;
+        }
+
+        .challenge-info strong {
+            display: inline-block;
+            width: 120px;
+        }
+
+        /* Prompt Input */
+        .prompt-section {
+            margin-bottom: 2rem;
+        }
+
+        .prompt-section h4 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .prompt-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .prompt-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        /* Player Name Input */
+        .player-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .player-input input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .player-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
         }
 
-        .btn-send:disabled {
+        .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-response {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .ai-response h4 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-response-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Score Cards */
+        .score-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .score-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .score-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .score-card.clarity { border-top: 4px solid #3b82f6; }
+        .score-card.instruction { border-top: 4px solid #10b981; }
+        .score-card.hallucination { border-top: 4px solid #f59e0b; }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-card.clarity .score-value { color: #3b82f6; }
+        .score-card.instruction .score-value { color: #10b981; }
+        .score-card.hallucination .score-value { color: #f59e0b; }
+
+        .score-feedback {
+            font-size: 0.85rem;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        /* Total Score */
+        .total-score {
+            background: linear-gradient(135deg, var(--dark) 0%, #312e81 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .total-score h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .total-score .big-score {
+            font-size: 5rem;
+            font-weight: 700;
+        }
+
+        .total-score .score-label {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .overall-feedback {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .overall-feedback h4 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .overall-feedback p {
+            line-height: 1.6;
+        }
+
+        /* Leaderboard */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .leaderboard-table th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .leaderboard-table tr:hover {
+            background: #fafafa;
+        }
+
+        .rank-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .rank-1 { background: #ffd700; color: #7c5800; }
+        .rank-2 { background: #c0c0c0; color: #4a4a4a; }
+        .rank-3 { background: #cd7f32; color: #5a3800; }
+        .rank-default { background: var(--light); color: var(--text); }
+
+        .score-badge {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Loading */
         .loading {
             display: none;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 18px;
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            max-width: 70%;
+            text-align: center;
+            padding: 2rem;
         }
 
         .loading.show {
-            display: flex;
+            display: block;
         }
 
-        .loading-dots {
-            display: flex;
-            gap: 5px;
-        }
-
-        .loading-dot {
-            width: 8px;
-            height: 8px;
-            background: #667eea;
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--light);
+            border-top-color: var(--primary);
             border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
 
-        .loading-dot:nth-child(1) {
-            animation-delay: -0.32s;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .loading-dot:nth-child(2) {
-            animation-delay: -0.16s;
-        }
-
-        @keyframes bounce {
-            0%, 80%, 100% {
-                transform: scale(0);
-            }
-            40% {
-                transform: scale(1);
-            }
-        }
-
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 12px 18px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 4px solid #c33;
-        }
-
+        /* Empty State */
         .empty-state {
             text-align: center;
-            color: #999;
-            padding: 40px 20px;
+            padding: 3rem;
+            color: #6b7280;
         }
 
-        .empty-state svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0.5;
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
         }
 
-        /* Scrollbar Styling */
-        .chat-container::-webkit-scrollbar {
-            width: 8px;
+        /* Tips Section */
+        .tips-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
         }
 
-        .chat-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        .tips-section h4 {
+            color: #92400e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .chat-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
+        .tips-list {
+            list-style: none;
         }
 
-        .chat-container::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        .tips-list li {
+            padding: 0.5rem 0;
+            color: #78350f;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .tips-list li::before {
+            content: "✓";
+            color: #059669;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255,255,255,0.7);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header"> 
-            <div style="display: flex; gap: 5px">
-                <img src="https://cdn-icons-png.flaticon.com/512/11373/11373469.png" alt="Tanaka AI" style="width: 40px; height: 40px;">
-                <h1 style="padding-top: 4px;"> Tanaka AI Assistant</h1>
-            </div>
-            
-            <div class="header-buttons">
-                <button class="btn-reset" onclick="resetChat()">Reset Chat</button>
-                <button class="btn-clear" onclick="clearAll()">Clear All</button>
-            </div>
+        <!-- Header -->
+        <header class="header">
+            <h1>PromptPing</h1>
+            <p>Game Evaluasi Kemampuan Membuat Prompt AI</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('play')">Main Game</button>
+            <button class="nav-tab" onclick="showSection('leaderboard')">Leaderboard</button>
+            <button class="nav-tab" onclick="showSection('guide')">Panduan</button>
+        </nav>
+
+        <!-- Main Card -->
+        <div class="main-card">
+            <!-- Play Section -->
+            <section id="play-section" class="page-section active">
+                <!-- Step 1: Choose Challenge -->
+                <div id="step-choose" class="step-section">
+                    <h2 style="margin-bottom: 1.5rem; color: var(--dark);">Pilih Challenge</h2>
+                    <div class="challenge-grid" id="challenge-grid">
+                        <!-- Challenges loaded here -->
+                    </div>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn btn-primary" onclick="startChallenge()" id="start-btn" disabled>
+                            Mulai Challenge
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Play Game -->
+                <div id="step-play" class="step-section" style="display: none;">
+                    <div class="game-section">
+                        <!-- Current Challenge Info -->
+                        <div class="current-challenge" id="current-challenge">
+                            <!-- Challenge info loaded here -->
+                        </div>
+
+                        <!-- Player Name -->
+                        <div class="player-input">
+                            <input type="text" id="player-name" placeholder="Masukkan nama kamu..." maxlength="50">
+                        </div>
+
+                        <!-- Prompt Input -->
+                        <div class="prompt-section">
+                            <h4>Tulis Prompt Kamu:</h4>
+                            <textarea
+                                class="prompt-textarea"
+                                id="user-prompt"
+                                placeholder="Tulis prompt yang akan kamu kirim ke AI untuk menyelesaikan tugas di atas..."
+                                maxlength="2000"
+                            ></textarea>
+                            <div class="char-count"><span id="char-count">0</span>/2000 karakter</div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button class="btn btn-primary btn-block" onclick="submitPrompt()" id="submit-btn">
+                            Kirim & Evaluasi Prompt
+                        </button>
+
+                        <!-- Loading -->
+                        <div class="loading" id="loading">
+                            <div class="spinner"></div>
+                            <p>Mengevaluasi prompt kamu...</p>
+                        </div>
+
+                        <!-- Results -->
+                        <div class="results-section" id="results-section">
+                            <!-- AI Response -->
+                            <div class="ai-response">
+                                <h4>Respons AI:</h4>
+                                <div class="ai-response-content" id="ai-response-content"></div>
+                            </div>
+
+                            <!-- Score Cards -->
+                            <div class="score-cards">
+                                <div class="score-card clarity">
+                                    <div class="score-label">Clarity</div>
+                                    <div class="score-value" id="clarity-score">0</div>
+                                    <div class="score-feedback" id="clarity-feedback">-</div>
+                                </div>
+                                <div class="score-card instruction">
+                                    <div class="score-label">Instruction Following</div>
+                                    <div class="score-value" id="instruction-score">0</div>
+                                    <div class="score-feedback" id="instruction-feedback">-</div>
+                                </div>
+                                <div class="score-card hallucination">
+                                    <div class="score-label">Anti-Hallucination</div>
+                                    <div class="score-value" id="hallucination-score">0</div>
+                                    <div class="score-feedback" id="hallucination-feedback">-</div>
+                                </div>
+                            </div>
+
+                            <!-- Total Score -->
+                            <div class="total-score">
+                                <h3>Total Score</h3>
+                                <div class="big-score" id="total-score">0</div>
+                                <div class="score-label">dari 100</div>
+                            </div>
+
+                            <!-- Overall Feedback -->
+                            <div class="overall-feedback">
+                                <h4>Feedback & Tips:</h4>
+                                <p id="overall-feedback">-</p>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                                <button class="btn btn-secondary" onclick="tryAgain()">
+                                    Coba Lagi
+                                </button>
+                                <button class="btn btn-primary" onclick="backToChoose()">
+                                    Challenge Lain
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Back Button -->
+                        <div style="text-align: center; margin-top: 1.5rem;">
+                            <button class="btn btn-secondary" onclick="backToChoose()">
+                                Kembali ke Pilih Challenge
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leaderboard Section -->
+            <section id="leaderboard-section" class="page-section">
+                <h2 style="margin-bottom: 1.5rem; color: var(--dark);">Leaderboard</h2>
+                <div id="leaderboard-content">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Nama</th>
+                                <th>Challenge</th>
+                                <th>Clarity</th>
+                                <th>Instruction</th>
+                                <th>Hallucination</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <!-- Leaderboard data loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Guide Section -->
+            <section id="guide-section" class="page-section">
+                <h2 style="margin-bottom: 1.5rem; color: var(--dark);">Panduan Bermain</h2>
+
+                <div class="tips-section" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); margin-bottom: 1.5rem;">
+                    <h4 style="color: #1e40af;">Cara Bermain</h4>
+                    <ol style="padding-left: 1.5rem; color: #1e3a8a;">
+                        <li style="padding: 0.5rem 0;">Pilih challenge yang ingin kamu kerjakan</li>
+                        <li style="padding: 0.5rem 0;">Baca tugas dan konteks dengan seksama</li>
+                        <li style="padding: 0.5rem 0;">Tulis prompt terbaik kamu untuk menyelesaikan tugas</li>
+                        <li style="padding: 0.5rem 0;">Kirim dan lihat evaluasi dari 3 kriteria</li>
+                        <li style="padding: 0.5rem 0;">Perbaiki prompt dan coba lagi untuk skor lebih tinggi!</li>
+                    </ol>
+                </div>
+
+                <div class="tips-section" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); margin-bottom: 1.5rem;">
+                    <h4 style="color: #065f46;">Kriteria Penilaian</h4>
+                    <ul class="tips-list">
+                        <li><strong>Clarity (Kejelasan):</strong> Seberapa jelas dan tidak ambigu prompt kamu</li>
+                        <li><strong>Instruction Following:</strong> Seberapa baik prompt memenuhi persyaratan tugas</li>
+                        <li><strong>Anti-Hallucination:</strong> Seberapa baik prompt mencegah AI mengarang informasi</li>
+                    </ul>
+                </div>
+
+                <div class="tips-section">
+                    <h4 style="color: #92400e;">Tips Membuat Prompt yang Baik</h4>
+                    <ul class="tips-list">
+                        <li>Jelaskan konteks dan latar belakang dengan jelas</li>
+                        <li>Sebutkan format output yang diinginkan</li>
+                        <li>Berikan batasan atau constraint jika perlu</li>
+                        <li>Minta AI untuk mengakui jika tidak tahu</li>
+                        <li>Gunakan bahasa yang spesifik, hindari kata-kata ambigu</li>
+                        <li>Break down tugas kompleks menjadi langkah-langkah</li>
+                        <li>Berikan contoh jika memungkinkan</li>
+                    </ul>
+                </div>
+            </section>
         </div>
 
-        <div class="chat-container" id="chatContainer">
-            <div class="empty-state" id="emptyState">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-                <p>Mulai percakapan dengan Tanaka AI</p>
-            </div>
-        </div>
-
-        <div class="input-container">
-            <div id="errorContainer"></div>
-            <form class="input-form" id="chatForm">
-                <input 
-                    type="text" 
-                    id="messageInput" 
-                    placeholder="Ketik pesan Anda..." 
-                    autocomplete="off"
-                    required
-                >
-                <button type="submit" class="btn-send" id="sendBtn">Kirim</button>
-            </form>
-        </div>
+        <!-- Footer -->
+        <footer class="footer">
+            <p>PromptPing - Belajar Membuat Prompt AI yang Efektif</p>
+        </footer>
     </div>
 
     <script>
-        // Load chat history on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            loadChatHistory();
+        // State
+        let challenges = [];
+        let selectedChallenge = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadChallenges();
+            loadLeaderboard();
+
+            // Character count
+            document.getElementById('user-prompt').addEventListener('input', function() {
+                document.getElementById('char-count').textContent = this.value.length;
+            });
         });
 
-        // Load existing chat history
-        function loadChatHistory() {
-            fetch('/get_history')
-                .then(response => response.json())
-                .then(data => {
-                    const chatContainer = document.getElementById('chatContainer');
-                    const emptyState = document.getElementById('emptyState');
-                    
-                    if (data.messages && data.messages.length > 0) {
-                        emptyState.style.display = 'none';
-                        data.messages.forEach(msg => {
-                            if (msg.is_user) {
-                                appendMessage(msg.q, 'user', msg.timestamp);
-                            } else {
-                                appendMessage(msg.a, 'ai', msg.timestamp);
-                            }
-                        });
-                        scrollToBottom();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading history:', error);
-                });
+        // Show Section
+        function showSection(section) {
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update sections
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(section + '-section').classList.add('active');
+
+            // Refresh leaderboard when shown
+            if (section === 'leaderboard') {
+                loadLeaderboard();
+            }
         }
 
-        // Handle form submission
-        document.getElementById('chatForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
+        // Load Challenges
+        async function loadChallenges() {
+            try {
+                const response = await fetch('/api/challenges');
+                const data = await response.json();
 
-            // Disable input and button
-            const sendBtn = document.getElementById('sendBtn');
-            input.disabled = true;
-            sendBtn.disabled = true;
-            
-            // Clear error
-            document.getElementById('errorContainer').innerHTML = '';
-            
-            // Hide empty state
-            document.getElementById('emptyState').style.display = 'none';
-            
-            // Add user message to UI
-            appendMessage(message, 'user');
-            
-            // Clear input
-            input.value = '';
-            
-            // Show loading indicator
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'message ai';
-            loadingDiv.innerHTML = `
-                <div class="loading show">
-                    <div class="loading-dots">
-                        <div class="loading-dot"></div>
-                        <div class="loading-dot"></div>
-                        <div class="loading-dot"></div>
-                    </div>
-                    <span>Tanaka sedang berpikir...</span>
-                </div>
-            `;
-            document.getElementById('chatContainer').appendChild(loadingDiv);
-            scrollToBottom();
-            
-            // Send message to server
-            fetch('/send_message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Remove loading indicator
-                loadingDiv.remove();
-                
-                if (data.error) {
-                    showError(data.error);
-                } else {
-                    // Add AI response to UI
-                    appendMessage(data.response, 'ai', data.timestamp);
+                if (data.success) {
+                    challenges = data.data;
+                    renderChallenges();
                 }
-                
-                // Re-enable input and button
-                input.disabled = false;
-                sendBtn.disabled = false;
-                input.focus();
-            })
-            .catch(error => {
-                loadingDiv.remove();
-                showError('Terjadi kesalahan: ' + error.message);
-                input.disabled = false;
-                sendBtn.disabled = false;
-            });
-        });
+            } catch (error) {
+                console.error('Error loading challenges:', error);
+            }
+        }
 
-        // Append message to chat
-        function appendMessage(text, type, timestamp = null) {
-            const chatContainer = document.getElementById('chatContainer');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            
-            const timeStr = timestamp ? new Date(timestamp).toLocaleTimeString('id-ID', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            }) : new Date().toLocaleTimeString('id-ID', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-            
-            messageDiv.innerHTML = `
-                <div class="message-content">
-                    ${escapeHtml(text)}
-                    <span class="message-time">${timeStr}</span>
+        // Render Challenges
+        function renderChallenges() {
+            const grid = document.getElementById('challenge-grid');
+            grid.innerHTML = challenges.map(challenge => `
+                <div class="challenge-card" onclick="selectChallenge(${challenge.id})" id="challenge-${challenge.id}">
+                    <div class="challenge-header">
+                        <div class="challenge-number">${challenge.id}</div>
+                        <span class="difficulty-badge difficulty-${challenge.difficulty}">${challenge.difficulty}</span>
+                    </div>
+                    <div class="challenge-title">${challenge.title}</div>
+                    <div class="challenge-task">${challenge.task}</div>
+                </div>
+            `).join('');
+        }
+
+        // Select Challenge
+        function selectChallenge(id) {
+            // Clear previous selection
+            document.querySelectorAll('.challenge-card').forEach(card => card.classList.remove('selected'));
+
+            // Set new selection
+            selectedChallenge = challenges.find(c => c.id === id);
+            document.getElementById('challenge-' + id).classList.add('selected');
+            document.getElementById('start-btn').disabled = false;
+        }
+
+        // Start Challenge
+        function startChallenge() {
+            if (!selectedChallenge) return;
+
+            // Show play step
+            document.getElementById('step-choose').style.display = 'none';
+            document.getElementById('step-play').style.display = 'block';
+
+            // Render challenge info
+            document.getElementById('current-challenge').innerHTML = `
+                <h3>Challenge #${selectedChallenge.id}: ${selectedChallenge.title}</h3>
+                <p style="margin-bottom: 1rem; font-size: 1.1rem;">${selectedChallenge.task}</p>
+                <div class="challenge-info">
+                    <p><strong>Konteks:</strong> ${selectedChallenge.context}</p>
+                    <p><strong>Output yang diharapkan:</strong> ${selectedChallenge.expected_output}</p>
                 </div>
             `;
-            
-            chatContainer.appendChild(messageDiv);
-            scrollToBottom();
+
+            // Reset form
+            document.getElementById('user-prompt').value = '';
+            document.getElementById('char-count').textContent = '0';
+            document.getElementById('results-section').classList.remove('show');
         }
 
-        // Show error message
-        function showError(message) {
-            const errorContainer = document.getElementById('errorContainer');
-            errorContainer.innerHTML = `<div class="error-message">${escapeHtml(message)}</div>`;
-            setTimeout(() => {
-                errorContainer.innerHTML = '';
-            }, 5000);
+        // Back to Choose
+        function backToChoose() {
+            document.getElementById('step-choose').style.display = 'block';
+            document.getElementById('step-play').style.display = 'none';
+            document.getElementById('results-section').classList.remove('show');
         }
 
-        // Reset chat
-        function resetChat() {
-            if (!confirm('Apakah Anda yakin ingin mereset percakapan?')) return;
-            
-            fetch('/reset', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('chatContainer').innerHTML = `
-                            <div class="empty-state" id="emptyState">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                </svg>
-                                <p>Mulai percakapan dengan Tanaka AI</p>
-                            </div>
-                        `;
-                        document.getElementById('messageInput').focus();
-                    }
-                })
-                .catch(error => {
-                    showError('Gagal mereset chat: ' + error.message);
+        // Try Again
+        function tryAgain() {
+            document.getElementById('user-prompt').value = '';
+            document.getElementById('char-count').textContent = '0';
+            document.getElementById('results-section').classList.remove('show');
+            document.getElementById('user-prompt').focus();
+        }
+
+        // Submit Prompt
+        async function submitPrompt() {
+            const prompt = document.getElementById('user-prompt').value.trim();
+            const playerName = document.getElementById('player-name').value.trim() || 'Anonymous';
+
+            if (!prompt) {
+                alert('Silakan tulis prompt terlebih dahulu!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('results-section').classList.remove('show');
+
+            try {
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        challenge_id: selectedChallenge.id,
+                        player_name: playerName
+                    })
                 });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data.data);
+                } else {
+                    alert('Error: ' + (data.error || 'Terjadi kesalahan'));
+                }
+            } catch (error) {
+                console.error('Error submitting:', error);
+                alert('Terjadi kesalahan saat mengirim prompt');
+            } finally {
+                document.getElementById('submit-btn').disabled = false;
+                document.getElementById('loading').classList.remove('show');
+            }
         }
 
-        // Clear all data
-        function clearAll() {
-            if (!confirm('PERINGATAN: Ini akan menghapus SEMUA data termasuk knowledge base. Lanjutkan?')) return;
-            
-            fetch('/clear_all', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('chatContainer').innerHTML = `
-                            <div class="empty-state" id="emptyState">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                </svg>
-                                <p>Semua data telah dihapus. Mulai percakapan baru.</p>
-                            </div>
-                        `;
-                        alert('Semua data berhasil dihapus!');
-                    }
-                })
-                .catch(error => {
-                    showError('Gagal menghapus data: ' + error.message);
-                });
+        // Display Results
+        function displayResults(data) {
+            const evaluation = data.evaluation;
+
+            // AI Response
+            document.getElementById('ai-response-content').textContent = data.ai_response;
+
+            // Scores
+            document.getElementById('clarity-score').textContent = evaluation.clarity.score;
+            document.getElementById('clarity-feedback').textContent = evaluation.clarity.feedback;
+
+            document.getElementById('instruction-score').textContent = evaluation.instruction_following.score;
+            document.getElementById('instruction-feedback').textContent = evaluation.instruction_following.feedback;
+
+            document.getElementById('hallucination-score').textContent = evaluation.hallucination.score;
+            document.getElementById('hallucination-feedback').textContent = evaluation.hallucination.feedback;
+
+            // Total Score
+            document.getElementById('total-score').textContent = Math.round(evaluation.total_score);
+
+            // Overall Feedback
+            document.getElementById('overall-feedback').textContent = evaluation.overall_feedback;
+
+            // Show results
+            document.getElementById('results-section').classList.add('show');
+
+            // Scroll to results
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Scroll to bottom
-        function scrollToBottom() {
-            const chatContainer = document.getElementById('chatContainer');
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        // Load Leaderboard
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch('/api/leaderboard');
+                const data = await response.json();
+
+                if (data.success) {
+                    renderLeaderboard(data.data);
+                }
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+            }
         }
 
-        // Escape HTML to prevent XSS
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;',
-                '\n': '<br>'
-            };
-            return text.replace(/[&<>"'\n]/g, m => map[m]);
-        }
+        // Render Leaderboard
+        function renderLeaderboard(players) {
+            const tbody = document.getElementById('leaderboard-body');
 
-        // Auto-focus on input
-        document.getElementById('messageInput').focus();
+            if (players.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 3rem; color: #6b7280;">
+                            Belum ada data. Jadilah yang pertama!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = players.map((player, index) => {
+                const rank = index + 1;
+                let rankClass = 'rank-default';
+                if (rank === 1) rankClass = 'rank-1';
+                else if (rank === 2) rankClass = 'rank-2';
+                else if (rank === 3) rankClass = 'rank-3';
+
+                return `
+                    <tr>
+                        <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+                        <td><strong>${player.player_name}</strong></td>
+                        <td>${player.challenge_title}</td>
+                        <td>${player.scores.clarity}</td>
+                        <td>${player.scores.instruction_following}</td>
+                        <td>${player.scores.hallucination}</td>
+                        <td><span class="score-badge">${Math.round(player.total_score)}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
     </script>
 </body>
 </html>

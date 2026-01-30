@@ -1,13 +1,64 @@
-.vercel
-*.log
-*.pyc
-__pycache__
+# Environment Variables
+.env
+.env.local
+.env.*.local
 
-# Environments 
-.env 
-.venv 
-env/ 
-venv/ 
-ENV/ 
-env.bak/ 
-venv.bak/ 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# ChromaDB
+screening_data/chroma_db/
+chroma_db/
+
+# Uploads
+screening_data/uploads/
+
+# Game Data (leaderboard)
+game_data/
+
+# System
+.vercel
+.claude/ 
