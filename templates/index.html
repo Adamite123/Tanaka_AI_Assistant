@@ -921,10 +921,32 @@
             font-size: 0.85rem;
         }
 
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        .footer .credit {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
         @media (min-width: 768px) {
             .footer {
                 padding: 2rem;
                 font-size: 1rem;
+            }
+
+            .footer .credit {
+                font-size: 0.85rem;
             }
         }
 
@@ -1180,6 +1202,7 @@
         <!-- Footer -->
         <footer class="footer">
             <p>PromptPing - Belajar Membuat Prompt AI yang Efektif</p>
+            <p class="credit">Created by <a href="https://www.linkedin.com/in/adamzzz/" target="_blank" rel="noopener noreferrer">Adam Muhammad</a></p>
         </footer>
     </div>
 
